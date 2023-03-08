@@ -1,2 +1,4 @@
 #!/bin/bash
 echo $(pwd)
+
+/root/alx-system_engineering-devops
