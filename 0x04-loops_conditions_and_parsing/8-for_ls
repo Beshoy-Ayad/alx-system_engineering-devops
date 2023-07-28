@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # A Bash script that displays the content of the current directory in a list format, where only the part of the name after the first dash is displayed
-
-for file in *
-do
-  echo ${file#*-}
+list=$(ls -1)
+for f in $list; do
+	echo "$f" | cut -d "-" -f2-
 done
-
