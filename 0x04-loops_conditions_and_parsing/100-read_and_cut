@@ -5,4 +5,3 @@ while IFS=: read -r username password uid gid fullname homedir shell
 do
   echo "$username:$uid:$homedir"
 done < /etc/passwd
-
