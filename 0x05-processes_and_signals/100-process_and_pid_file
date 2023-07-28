@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# This script creates the file /var/run/myscript.pid containing its PID
+echo $$ > /var/run/myscript.pid
+
+quit_handler() {
+  echo "Bye bye!"
+  rm /var/run/myscript.pid
+  exit 0
+}
+
+int_handler() {
+  echo "Y U no love me?!"
+}
+
+term_handler() {
+  echo "I hate the kill command"
+}
+
+trap quit_handler SIGQUIT SIGTERM
+trap int_handler SIGINT
+trap term_handler SIGTERM
+
+while true; do
+  echo "To infinity and beyond"
+  sleep 1
+done
