@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#Add the SSH public key below to your server
 ssh ubuntu@54.146.56.206
 mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys
 chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys
