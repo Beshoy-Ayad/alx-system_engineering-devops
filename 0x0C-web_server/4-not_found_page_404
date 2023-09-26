@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Serve a page that would return a Hello World string
+
+sudo apt-get update -y
+sudo apt-get install nginx -y
+sudo service nginx start
+echo -e "Hello World!" > /var/www/html/index.nginx-debian.html
+echo "Ceci n'est pas une page" >> /var/www/html/error_404.html
+sudo sed -i '25i\	error_page 404 /error_404.html;' /etc/nginx/sites-available/default
+
+sudo service nginx restart
