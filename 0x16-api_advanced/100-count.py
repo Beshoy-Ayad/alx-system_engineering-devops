@@ -1,52 +1,49 @@
 #!/usr/bin/python3
 """
-Python script that, using this REST API, for a given subreddit,
-returns all its hot posts for a given subreddit.
+100-count
 """
-
 import requests
 
-def count_words(subreddit, word_list, after=None, results=None):
-    if results is None:
-        results = {}
-
-    headers = {'User-Agent': 'Mozilla/5.0'}  # Provide a user agent to prevent issues with Reddit API
-
-    url = f'https://www.reddit.com/r/{subreddit}/hot.json?limit=100&after={after or ""}'
-    response = requests.get(url, headers=headers)
-
+def count_words(subreddit, word_list, after=None, count={}):
+    """
+    Recursive function that queries the Reddit API, parses the title of all hot
+    articles, and prints a sorted count of given keywords
+    """
+    # Base case: invalid subreddit or no more pages
+    if after is None and count == {}:
+        return None
+    # Set the headers and parameters for the request
+    headers = {'User-Agent': 'python3:100-count:v1.0'}
+    params = {'limit': 100, 'after': after}
+    # Make the request to the subreddit's hot articles
+    response = requests.get('https://www.reddit.com/r/{}/hot.json'.format(subreddit), headers=headers, params=params, allow_redirects=False)
+    # Check the status code
     if response.status_code != 200:
-        print(f"Error: Unable to fetch data from Reddit. Status code: {response.status_code}")
-        return
-
-    data = response.json().get('data', {})
-    articles = data.get('children', [])
-
+        return None
+    # Get the data as a dictionary
+    data = response.json().get('data')
+    # Get the list of hot articles
+    articles = data.get('children')
+    # Loop through the articles
     for article in articles:
-        title = article['data']['title'].lower()
+        # Get the title of the article
+        title = article.get('data').get('title').lower()
+        # Loop through the word list
         for word in word_list:
-            if word.lower() in title:
-                results[word] = results.get(word, 0) + title.count(word.lower())
-
+            # Check if the word is in the title
+            if word.lower() in title.split():
+                # Increment the count of the word
+                count[word.lower()] = count.get(word.lower(), 0) + title.split().count(word.lower())
+    # Get the next page
     after = data.get('after')
-    if after:
-        return count_words(subreddit, word_list, after, results)
-    else:
-        print_results(results)
-
-def print_results(results):
-    sorted_results = sorted(results.items(), key=lambda item: (-item[1], item[0].lower()))
-    for word, count in sorted_results:
-        print(f"{word}: {count}")
-
-if __name__ == '__main__':
-    import sys
-
-    if len(sys.argv) < 3:
-        print("Usage: {} <subreddit> <list of keywords>".format(sys.argv[0]))
-        print("Example: {} programming 'python java javascript'".format(sys.argv[0]))
-    else:
-        subreddit = sys.argv[1]
-        word_list = sys.argv[2].split()
-        count_words(subreddit, word_list)
+    # Recursive call with the next page and the current count
+    count_words(subreddit, word_list, after, count)
+    # Print the results
+    if after is None:
+        # Sort the count by value and then by key
+        sorted_count = sorted(count.items(), key=lambda x: (-x[1], x[0]))
+        # Loop through the sorted count
+        for key, value in sorted_count:
+            # Print the word and the count
+            print('{}: {}'.format(key, value))
 
